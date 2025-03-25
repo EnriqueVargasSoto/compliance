@@ -5,6 +5,8 @@ namespace Modules\Security\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -19,7 +21,7 @@ class UserController extends Controller
             $perPage = $request->get('per_page');
             $search = $request->get('search');
 
-            $query = User::orderBy('id', 'asc');
+            $query = User::with('person')->orderBy('id', 'asc');
 
             // Aplicar la búsqueda si se proporciona un término
             if ($search) {
@@ -204,10 +206,30 @@ class UserController extends Controller
         }
     }
 
-    public function initTable(){
+    public function initTable(Request $request){
+
+        $user = Auth::user();
+        $officeId = $request->input('office_id'); // ID de la oficina
+        $moduleName = $request->input('module_name') ?? 'modules'; // Nombre del módulo (Ej: "modulos")
+
+        if (!$officeId || !$moduleName) {
+            return response()->json(['error' => 'Oficina y módulo son requeridos'], 400);
+        }
+
+        // Obtener todos los permisos del usuario en la oficina
+        $permissions = $user->getPermissionsByOffice($officeId);
+
+        // Filtrar solo los permisos relacionados con el módulo especificado
+        $modulePermissions = $permissions->filter(function ($permission) use ($moduleName) {
+            return Str::startsWith($permission, $moduleName . '.');
+        })->values();
 
         $headers = [
-            ['title' => 'email', 'key'=> 'name'],
+
+            ['title' => 'nombres', 'key'=> 'person.names'],
+            ['title' => 'Apellidos', 'key'=> 'person.surnames'],
+            ['title' => 'DNI', 'key'=> 'person.dni'],
+            ['title' => 'email', 'key'=> 'email'],
             ['title' => 'Acciones', 'key'=> 'actions', 'sortable' => false]
         ];
 
@@ -229,7 +251,8 @@ class UserController extends Controller
             'check' => false,
             'colors' => $colors,
             'search' => true, */
-            'item_selects' => $itemSelects
+            'item_selects' => $itemSelects,
+            'permissions' => $modulePermissions, // Solo los permisos del módulo solicitado
         ];
         return response()->json(['data'=>$data]);
     }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Modules\Security\Models\Module;
 use Modules\Security\Models\Office;
 use Modules\Security\Models\Person;
 use Spatie\Permission\Models\Permission;
@@ -92,4 +93,55 @@ class User extends Authenticatable implements JWTSubject
                     ->withTimestamps()
                     ->withTrashed();
     }
+
+   // Obtener roles del usuario en una oficina específica
+   public function getRolesByOffice($officeId)
+   {
+       return Role::whereIn('id', function ($query) use ($officeId) {
+           $query->select('role_id')
+                 ->from('office_user_roles')
+                 ->where('user_id', $this->id)
+                 ->where('office_id', $officeId);
+       })->pluck('name');
+   }
+
+   // Obtener permisos del usuario en una oficina específica
+   public function getPermissionsByOffice($officeId)
+   {
+       $rolePermissions = Permission::whereIn('id', function ($query) use ($officeId) {
+           $query->select('permission_id')
+                 ->from('role_has_permissions')
+                 ->whereIn('role_id', function ($subQuery) use ($officeId) {
+                     $subQuery->select('role_id')
+                              ->from('office_user_roles')
+                              ->where('user_id', $this->id)
+                              ->where('office_id', $officeId);
+                 });
+       })->pluck('name');
+
+       $directPermissions = Permission::whereIn('id', function ($query) use ($officeId) {
+           $query->select('permission_id')
+                 ->from('office_user_permissions')
+                 ->where('user_id', $this->id)
+                 ->where('office_id', $officeId);
+       })->pluck('name');
+
+       return $rolePermissions->merge($directPermissions)->unique()->values();
+   }
+
+   // Obtener módulos a los que el usuario tiene acceso según los permisos en una oficina específica
+   public function getModulesByOffice($officeId)
+   {
+       return Module::whereIn('id', function ($query) use ($officeId) {
+           $query->select('module_id')
+                 ->from('module_has_permissions')
+                 ->whereIn('permission_id', function ($subQuery) use ($officeId) {
+                     $subQuery->select('id')->from('permissions')
+                              ->whereIn('name', $this->getPermissionsByOffice($officeId));
+                 });
+       })->get();
+   }
+
+
+
 }

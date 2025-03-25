@@ -2,15 +2,15 @@
 
 
 export async function getMenu() {
-    const valor = localStorage.getItem("menu");
+    const valor = useCookie('modules');//localStorage.getItem("menu");
 
     if (!valor) return [];
 
-    const menu = JSON.parse(valor);
+    const menu = valor;
+    console.log('menu', menu.value);
+    //const nuevoMenu = transformMenuData(menu);
 
-    const nuevoMenu = transformMenuData(menu);
-
-    return nuevoMenu;
+    return menu.value;// nuevoMenu;
 }
 
 

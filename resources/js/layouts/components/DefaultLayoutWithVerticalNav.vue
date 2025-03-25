@@ -11,15 +11,19 @@ import NavbarShortcuts from '@/layouts/components/NavbarShortcuts.vue'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
 import NavBarI18n from '@core/components/I18n.vue'
+import OfficesComponent from '@/components/Offices.vue'
 
 // @layouts plugin
 import { VerticalNavLayout } from '@layouts'
 
-const menu = ref([]);
+const offices = useCookie('offices');
+const menu = useCookie('modules');
 
-onBeforeMount(async () => {
-    menu.value = await getMenu();
-});
+/* onBeforeMount(async () => {
+    console.log('modules antes:', useCookie('modules'));
+    menu.value = useCookie('modules');
+    console.log('modules', menu.value);
+}); */
 </script>
 
 <template>
@@ -42,7 +46,12 @@ onBeforeMount(async () => {
 
         <VSpacer />
 
-       <!--  <NavBarI18n
+        <OfficesComponent
+            v-if="offices.length > 1"
+            :languages="offices"
+        />
+
+        <!-- <NavBarI18n
           v-if="themeConfig.app.i18n.enable && themeConfig.app.i18n.langConfig?.length"
           :languages="themeConfig.app.i18n.langConfig"
         /> -->

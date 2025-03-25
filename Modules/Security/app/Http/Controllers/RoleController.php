@@ -4,7 +4,9 @@ namespace Modules\Security\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Str;
 
 class RoleController extends Controller
 {
@@ -19,7 +21,7 @@ class RoleController extends Controller
             $perPage = $request->get('per_page');
             $search = $request->get('search');
 
-            $query = Role::orderBy('id', 'asc');
+            $query = Role::with('users')->orderBy('id', 'asc');
 
             // Aplicar la búsqueda si se proporciona un término
             if ($search) {
@@ -179,10 +181,27 @@ class RoleController extends Controller
         }
     }
 
-    public function initTable(){
+    public function initTable(Request $request){
+
+        $user = Auth::user();
+        $officeId = $request->input('office_id'); // ID de la oficina
+        $moduleName = $request->input('module_name') ?? 'modules'; // Nombre del módulo (Ej: "modulos")
+
+        if (!$officeId || !$moduleName) {
+            return response()->json(['error' => 'Oficina y módulo son requeridos'], 400);
+        }
+
+        // Obtener todos los permisos del usuario en la oficina
+        $permissions = $user->getPermissionsByOffice($officeId);
+
+        // Filtrar solo los permisos relacionados con el módulo especificado
+        $modulePermissions = $permissions->filter(function ($permission) use ($moduleName) {
+            return Str::startsWith($permission, $moduleName . '.');
+        })->values();
 
         $headers = [
             ['title' => 'Rol', 'key'=> 'name'],
+
             ['title' => 'Guard', 'key'=> 'guard_name'],
             ['title' => 'Acciones', 'key'=> 'actions', 'sortable' => false]
         ];
@@ -205,7 +224,8 @@ class RoleController extends Controller
             'check' => false,
             'colors' => $colors,
             'search' => true, */
-            'item_selects' => $itemSelects
+            'item_selects' => $itemSelects,
+            'permissions' => $modulePermissions, // Solo los permisos del módulo solicitado
         ];
         return response()->json(['data'=>$data]);
     }

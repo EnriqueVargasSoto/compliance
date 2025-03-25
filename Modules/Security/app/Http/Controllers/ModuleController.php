@@ -4,7 +4,10 @@ namespace Modules\Security\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Modules\Security\Models\Module;
+use Illuminate\Support\Str;
+
 
 class ModuleController extends Controller
 {
@@ -180,7 +183,23 @@ class ModuleController extends Controller
         }
     }
 
-    public function initTable(){
+    public function initTable(Request $request){
+
+        $user = Auth::user();
+        $officeId = $request->input('office_id'); // ID de la oficina
+        $moduleName = $request->input('module_name') ?? 'modules'; // Nombre del módulo (Ej: "modulos")
+
+        if (!$officeId || !$moduleName) {
+            return response()->json(['error' => 'Oficina y módulo son requeridos'], 400);
+        }
+
+        // Obtener todos los permisos del usuario en la oficina
+        $permissions = $user->getPermissionsByOffice($officeId);
+
+        // Filtrar solo los permisos relacionados con el módulo especificado
+        $modulePermissions = $permissions->filter(function ($permission) use ($moduleName) {
+            return Str::startsWith($permission, $moduleName . '.');
+        })->values();
 
         $headers = [
             ['title' => 'Nombre', 'key'=> 'name'],
@@ -200,7 +219,7 @@ class ModuleController extends Controller
 
         $data = [
             'headers' => $headers,
-            'par_page' => 10,
+            'per_page' => 10,
             'page' => 1,
             'title' => 'Modulos',
             /* 'buttons' => $buttons,
@@ -208,7 +227,8 @@ class ModuleController extends Controller
             'check' => false,
             'colors' => $colors,
             'search' => true, */
-            'item_selects' => $itemSelects
+            'item_selects' => $itemSelects,
+            'permissions' => $modulePermissions, // Solo los permisos del módulo solicitado
         ];
         return response()->json(['data'=>$data]);
     }

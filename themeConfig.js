@@ -20,6 +20,11 @@ export const { themeConfig, layoutConfig } = defineThemeConfig({
       defaultLocale: 'en',
       langConfig: [
         {
+            label: 'Espanish',
+            i18nLang: 'es',
+            isRTL: false,
+        },
+        {
           label: 'English',
           i18nLang: 'en',
           isRTL: false,

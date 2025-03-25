@@ -5,7 +5,7 @@ const router = useRouter()
 const ability = useAbility()
 
 // TODO: Get type from backend
-const userData = useCookie('userData')
+const userData = useCookie('userData');
 
 const logout = async () => {
 

@@ -32,6 +32,7 @@
     const text_loading = ref('Cargando...');
 
     const offices = ref([]);
+    const officesDetails = ref([]);
 
     const rules = {
         required: v => !!v || 'Este campo es obligatorio.'
@@ -47,9 +48,14 @@
             text_loading.value = 'Ingresando...';
             isDialogVisible.value = true
             const officeSelect = offices.value.find(item => item.id === office.value);
+            const officeSelectDetail = officesDetails.value.find(item => item.id === office.value);
 
             useCookie('officeSelect').value = officeSelect;
-            const targetRoute = route.query.to ? String(route.query.to) : 'dashboard';
+            useCookie('roles').value = officeSelectDetail.roles;
+            useCookie('permissions').value = officeSelectDetail.permissions;
+            useCookie('modules').value = officeSelectDetail.modules;
+            useCookie('routeInitial').value = officeSelectDetail.modules[0].to;
+            const targetRoute = route.query.to ? String(route.query.to) : officeSelectDetail.modules[0].to;
             isDialogVisible.value = false;
             // Verificar si la ruta existe antes de redirigir
             if (router.hasRoute(targetRoute)) {
@@ -77,15 +83,24 @@
             isDialogVisible.value = true;
             const { data } = await useApi(`/me`);
             offices.value = data.value.user.offices;
-            useCookie('offices').value = offices.value;
+            officesDetails.value = data.value.offices;
+            useCookie('offices').value = data.value.user.offices;
             useCookie('userData').value = data.value.user.person;
+            sessionStorage.setItem('offices', JSON.stringify(data.value.offices));
             isDialogVisible.value = false;
+
             if (offices.value.length === 1) {
                 office.value = offices.value[0].id;
+
                 const officeSelect = offices.value.find(item => item.id === office.value);
+                const officeSelectDetail = officesDetails.value.find(item => item.id === office.value);
 
                 useCookie('officeSelect').value = officeSelect;
-                const targetRoute = route.query.to ? String(route.query.to) : 'dashboard';
+                useCookie('roles').value = officeSelectDetail.roles;
+                useCookie('permissions').value = officeSelectDetail.permissions;
+                useCookie('modules').value = officeSelectDetail.modules;
+                useCookie('routeInitial').value = officeSelectDetail.modules[0].to;
+                const targetRoute = route.query.to ? String(route.query.to) : officeSelectDetail.modules[0].to;
 
                 // Verificar si la ruta existe antes de redirigir
                 if (router.hasRoute(targetRoute)) {
@@ -93,7 +108,7 @@
 
                     router.replace(targetRoute);
                 } else {
-                    console.warn(`Ruta no encontrada: ${targetRoute}`);
+                    console.warn(`Ruta no encontrada: ${targetRoute.value}`);
                 }
 
             }

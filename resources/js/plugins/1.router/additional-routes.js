@@ -30,124 +30,93 @@ export const redirects = [
     redirect: () => ({ name: 'pages-account-settings-tab', params: { tab: 'account' } }),
   }, */
 ]
-//export const routes = [
-  // Email filter
-  /* {
-    path: '/apps/email/filter/:filter',
-    name: 'apps-email-filter',
-    component: emailRouteComponent,
-    meta: {
-      navActiveLink: 'apps-email',
-      layoutWrapperClasses: 'layout-content-height-fixed',
-    },
-  }, */
 
-  // Email label
-  /* {
-    path: '/apps/email/label/:label',
-    name: 'apps-email-label',
-    component: emailRouteComponent,
-    meta: {
-      // contentClass: 'email-application',
-      navActiveLink: 'apps-email',
-      layoutWrapperClasses: 'layout-content-height-fixed',
-    },
-  },
-  {
-    path: '/dashboards/logistics',
-    name: 'dashboards-logistics',
-    component: () => import('@/pages/apps/logistics/dashboard.vue'),
-  },
-  {
-    path: '/dashboards/academy',
-    name: 'dashboards-academy',
-    component: () => import('@/pages/apps/academy/dashboard.vue'),
-  },
-  {
-    path: '/apps/ecommerce/dashboard',
-    name: 'apps-ecommerce-dashboard',
-    component: () => import('@/pages/dashboards/ecommerce.vue'),
-  }, */
-//]
 export const routes = [
     { path: '/', name:'/', redirect: '/dashboard' },
+
     {
         path: '/dashboard', // 📌 Asegúrate de que la ruta sea correcta
         name: 'dashboard',
         component: () => import('@/views/dashboards/Dashboard.vue'),//Dashboard,//DashboardAnalytics
         meta: { requiresAuth: true } // Ruta protegida
     },
+
+
     {
-        path: '/seguridad/modulos', // 📌 Asegúrate de que la ruta sea correcta
-        name: 'modulos',
-        component: () => import('@/views/modulos/Index.vue'),//DashboardAnalytics
+        path: '/modules', // 📌 Asegúrate de que la ruta sea correcta
+        name: 'modules',
+        component: () => import('@/views/security/modules/Index.vue'),//DashboardAnalytics
         meta: { requiresAuth: true } // Ruta protegida
     },
     {
-        path: '/seguridad/usuarios', // 📌 Asegúrate de que la ruta sea correcta
-        name: 'usuarios',
-        component: () => import('@/views/users/Index.vue'),//DashboardAnalytics
+        path: '/usuarios', // 📌 Asegúrate de que la ruta sea correcta
+        name: 'users',
+        component: () => import('@/views/security/users/Index.vue'),//DashboardAnalytics
         meta: { requiresAuth: true } // Ruta protegida
     },
     {
-        path: '/seguridad/roles-permisos/roles', // 📌 Asegúrate de que la ruta sea correcta
+        path: '/roles', // 📌 Asegúrate de que la ruta sea correcta
         name: 'roles',
-        component: () => import('@/views/roles-permisos/roles/Index.vue'),//DashboardAnalytics
+        component: () => import('@/views/security/roles_and_permissions/roles/Index.vue'),//DashboardAnalytics
         meta: { requiresAuth: true } // Ruta protegida
     },
     {
         path: '/seguridad/roles-permisos/permisos', // 📌 Asegúrate de que la ruta sea correcta
-        name: 'permisos',
+        name: 'permissions',
         component: () => import('@/views/roles-permisos/permisos/Index.vue'),//DashboardAnalytics
         meta: { requiresAuth: true } // Ruta protegida
     },
 
     {
-        path: '/maestros/oficinas', // 📌 Asegúrate de que la ruta sea correcta
-        name: 'oficinas',
+        path: '/branch', // 📌 Asegúrate de que la ruta sea correcta
+        name: 'branch',
         component: () => import('@/views/maestros/oficinas/Index.vue'),//DashboardAnalytics
         meta: { requiresAuth: true } // Ruta protegida
     },
+
     {
-        path: '/maestros/tipo-documento', // 📌 Asegúrate de que la ruta sea correcta
-        name: 'tipo-documento',
+        path: '/processes', // 📌 Asegúrate de que la ruta sea correcta
+        name: 'processes',
         component: () => import('@/views/maestros/tipos_documentos/Index.vue'),//DashboardAnalytics
         meta: { requiresAuth: true } // Ruta protegida
     },
+
     {
-        path: '/maestros/tipo-movimientos', // 📌 Asegúrate de que la ruta sea correcta
-        name: 'tipo-movimientos',
+        path: '/compliant-documents', // 📌 Asegúrate de que la ruta sea correcta
+        name: 'compliant-documents',
         component: () => import('@/views/maestros/tipo_movimientos/Index.vue'),//DashboardAnalytics
         meta: { requiresAuth: true } // Ruta protegida
     },
     {
-        path: '/maestros/tipo-unidad-organica', // 📌 Asegúrate de que la ruta sea correcta
-        name: 'tipo-unidad-organica',
+        path: '/observed-documents', // 📌 Asegúrate de que la ruta sea correcta
+        name: 'observed-documents',
         component: () => import('@/views/maestros/tipos_unidad_organica/Index.vue'),//DashboardAnalytics
         meta: { requiresAuth: true } // Ruta protegida
     },
+
     {
-        path: '/maestros/estados', // 📌 Asegúrate de que la ruta sea correcta
-        name: 'estados',
+        path: '/chat', // 📌 Asegúrate de que la ruta sea correcta
+        name: 'chat',
         component: () => import('@/views/maestros/estados/Index.vue'),//DashboardAnalytics
         meta: { requiresAuth: true } // Ruta protegida
     },
+
     {
-        path: '/maestros/prioridades', // 📌 Asegúrate de que la ruta sea correcta
-        name: 'prioridades',
+        path: '/digital-signature', // 📌 Asegúrate de que la ruta sea correcta
+        name: 'digital-signature',
         component: () => import('@/views/maestros/prioridades/Index.vue'),//DashboardAnalytics
         meta: { requiresAuth: true } // Ruta protegida
     },
     {
-        path: '/maestros/cargos', // 📌 Asegúrate de que la ruta sea correcta
-        name: 'cargos',
+        path: '/synchronization', // 📌 Asegúrate de que la ruta sea correcta
+        name: 'synchronization',
         component: () => import('@/views/maestros/cargos/Index.vue'),//DashboardAnalytics
         meta: { requiresAuth: true } // Ruta protegida
     },
 
     {
-        path: '/maestros/unidad-organica', // 📌 Asegúrate de que la ruta sea correcta
-        name: 'unidad-organica',
+        path: '/backup', // 📌 Asegúrate de que la ruta sea correcta
+        name: 'backup',
         component: () => import('@/views/maestros/unidades_organicas/Index.vue'),//DashboardAnalytics
         meta: { requiresAuth: true } // Ruta protegida
     },

@@ -80,7 +80,7 @@
         } catch (error) {
 
             console.error("Error al cargar la configuración de la tabla:", error);
-            await logout();
+            //await logout();
         }
     };
 

@@ -68,9 +68,9 @@ export const routes = [
     },
 
     {
-        path: '/branch', // 📌 Asegúrate de que la ruta sea correcta
-        name: 'branch',
-        component: () => import('@/views/maestros/oficinas/Index.vue'),//DashboardAnalytics
+        path: '/batches', // 📌 Asegúrate de que la ruta sea correcta
+        name: 'batches',
+        component: () => import('@/views/batches/Index.vue'),//DashboardAnalytics
         meta: { requiresAuth: true } // Ruta protegida
     },
 

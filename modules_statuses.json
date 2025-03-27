@@ -1,5 +1,7 @@
 {
     "Auth": true,
     "Security": true,
-    "Batches": true
+    "Batches": true,
+    "Processes": true,
+    "Documents": true
 }

@@ -194,15 +194,15 @@
                     <p class="mb-0">Inicie sesión en su cuenta y comience la aventura.</p>
                 </VCardText>
                 <div class="alert-demo-v-model-wrapper">
-    <VAlert
-      v-model="isAlertVisible"
-      color="error"
-      type="error"
-      variant="tonal"
-    >
-      {{error_auth}}
-    </VAlert>
-  </div>
+                    <VAlert
+                        v-model="isAlertVisible"
+                        color="error"
+                        type="error"
+                        variant="tonal"
+                    >
+                        {{error_auth}}
+                    </VAlert>
+                </div>
                 <VCardText>
                     <VForm
                         ref="refVForm"

@@ -1,11 +1,10 @@
 <?php
 
-namespace Modules\Batches\Database\Seeders;
+namespace Modules\Documents\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\Batches\Models\Batch;
 
-class BatchesDatabaseSeeder extends Seeder
+class DocumentsDatabaseSeeder extends Seeder
 {
     /**
      * Run the database seeds.

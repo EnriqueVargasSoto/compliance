@@ -1,17 +1,23 @@
 <script setup>
+import { type } from '../demos/components/alert/demoCodeAlert';
+
     const props = defineProps({
         endpoint: String, // Ruta API
         paramsInit: {
             type: Object,
             default: () => ({}),
         },
+
     })
+
+    const isDialogVisible = ref(false);
 
     const title = ref('');
     const headers = ref([]);
 
     const items_selects = ref([]);
     const permissions = ref([]);
+    const button_add = ref({});
 
     const params = ref({
         page: 1,
@@ -37,6 +43,7 @@
 
     // Función para inicializar la tabla (obtener configuración inicial)
     const fetchInitTabla = async () => {
+        isDialogVisible.value = true;
         try {
             const { data } = await useApi(createUrl(`/${props.endpoint}-init-table`,{query:props.paramsInit}));
 
@@ -47,9 +54,10 @@
             items_selects.value = data?.value.data?.item_selects || [];
             /* items_selects.value.push({ value: totalItems, title: 'Todos' }); */
             permissions.value = data?.value.data?.permissions || [];
-
+            button_add.value = data?.value.data?.button_add || {};
+            isDialogVisible.value = false;
         } catch (error) {
-
+            isDialogVisible.value = false;
             console.error("Error al cargar la configuración de la tabla:", error);
             //await logout();
         }
@@ -57,7 +65,27 @@
 
     // Llamar `fetchInitTabla` una vez al montar el componente
     onMounted(async () => {await fetchInitTabla();});
+
+    const menuList = ref([
+                {
+                    title: "Ver Procesos",
+                    icon: "tabler-eye-spark",
+                    action: "ver_proceso"
+                },
+                {
+                    title: "Editar",
+                    icon: "tabler-pencil",
+                    action: "editar"
+                },
+                {
+                    title: "Eliminar",
+                    icon: "tabler-trash",
+                    action: "eliminar"
+                }
+            ]);
+
 </script>
+
 <template>
     <VRow>
         <VCol cols="12">
@@ -73,22 +101,17 @@
                         <!-- Botones -->
                         <div class="d-flex align-center gap-4 flex-wrap">
                             <!-- Botón Crear Nuevo Módulo (Fuera de la Tabla) -->
+
                             <VBtn
                                 v-if="hasPermission(`${props.paramsInit.module_name}.create`)"
-                                color="primary">
-                                Crear Modulo
-                            </VBtn>
-                            <!-- <VBtn
-                                v-for="btn in buttons"
-                                :key="btn.action"
-                                :density="btn.density"
-                                :prepend-icon="btn.icon"
-                                :color="btn.color"
+                                :density="button_add.density"
+                                :prepend-icon="button_add.icon"
+                                :color="button_add.color"
                                 @click="handleAction(null)"
                                 :disabled="disabled"
                             >
-                                {{ btn.label }}
-                            </VBtn> -->
+                                {{ button_add.label }}
+                            </VBtn>
                         </div>
                     </div>
 
@@ -120,41 +143,34 @@
                     class="text-no-wrap"
                 >
 
-                    <!-- Actions -->
                     <template #item.actions="{ item }">
-                        <VBtn
-                            v-if="hasPermission(`${props.paramsInit.module_name}.edit`)"
-                            icon
-                            size="small"
-                            color="medium-emphasis"
-                            variant="text"
-                            @click="handleAction(item)"
-                        >
-                            <VIcon
-                                size="22"
-                                icon="tabler-edit"
+
+                        <VMenu>
+                            <template v-slot:activator="{ props }">
+                                <VBtn v-bind="props" icon size="small">
+                                    <VIcon>tabler-dots-vertical</VIcon>
+                                </VBtn>
+                            </template>
+
+                            <VList>
+                                <VListItem v-for="(permiso, index) in item.permisos" :key="index" @click="permiso.action">
+                                    <VListItemTitle>
+                                        <VIcon small class="mr-2">{{ permiso.icon }}</VIcon>
+                                        {{ permiso.title }}
+                                    </VListItemTitle>
+                                </VListItem>
+                            </VList>
+                        </VMenu>
+                        <!-- <div class="me-n2">
+                            <MoreBtn
+                                size="small"
+                                :menu-list="moreList"
                             />
-                        </VBtn>
-                        <VBtn
-                            v-if="hasPermission(`${props.paramsInit.module_name}.delete`)"
-                            icon
-                            size="small"
-                            color="medium-emphasis"
-                            variant="text"
-                            @click="eliminarRegistro(item.id)"
-                        >
-                            <VIcon
-                                icon="tabler-trash"
-                                size="22"
-                            />
-                        </VBtn>
-                        <!-- <IconBtn>
-                        <VIcon
-                            icon="tabler-dots-vertical"
-                            size="22"
-                        />
-                        </IconBtn> -->
+                        </div> -->
                     </template>
+
+                    <!-- Actions -->
+
 
 
                     <template #bottom>
@@ -192,6 +208,27 @@
             </VCard>
         </VCol>
     </VRow>
+
+     <!-- Dialog -->
+     <VDialog
+        v-model="isDialogVisible"
+        width="300"
+    >
+        <VCard
+        color="primary"
+        width="300"
+        >
+            <VCardText class="pt-3">
+                Cargando...
+                <VProgressLinear
+                indeterminate
+                bg-color="rgba(var(--v-theme-surface), 0.1)"
+                :height="8"
+                class="mb-0 mt-4"
+                />
+            </VCardText>
+        </VCard>
+    </VDialog>
 </template>
 <style scoped>
 </style>

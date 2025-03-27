@@ -1,5 +1,4 @@
 <script setup>
-import { type } from '../demos/components/alert/demoCodeAlert';
 
     const props = defineProps({
         endpoint: String, // Ruta API
@@ -63,26 +62,24 @@ import { type } from '../demos/components/alert/demoCodeAlert';
         }
     };
 
+    const handleAction = (item, action) => {
+        switch (action) {
+            case 'edit':
+            console.log(`Editar lote ID: ${item}, ${action}`);
+            break;
+            case 'delete':
+            console.log(`Eliminar lote ID: ${item.batch}, ${action}`);
+            break;
+            case 'view':
+            console.log(`Ver procesos del lote ID: ${item}, ${action}`);
+            case 'create':
+            console.log(`Ver procesos del lote ID: ${item}, ${action}`);
+            break;
+        }
+    };
+
     // Llamar `fetchInitTabla` una vez al montar el componente
     onMounted(async () => {await fetchInitTabla();});
-
-    const menuList = ref([
-                {
-                    title: "Ver Procesos",
-                    icon: "tabler-eye-spark",
-                    action: "ver_proceso"
-                },
-                {
-                    title: "Editar",
-                    icon: "tabler-pencil",
-                    action: "editar"
-                },
-                {
-                    title: "Eliminar",
-                    icon: "tabler-trash",
-                    action: "eliminar"
-                }
-            ]);
 
 </script>
 
@@ -107,7 +104,7 @@ import { type } from '../demos/components/alert/demoCodeAlert';
                                 :density="button_add.density"
                                 :prepend-icon="button_add.icon"
                                 :color="button_add.color"
-                                @click="handleAction(null)"
+                                @click="handleAction(null, 'create')"
                                 :disabled="disabled"
                             >
                                 {{ button_add.label }}
@@ -153,7 +150,7 @@ import { type } from '../demos/components/alert/demoCodeAlert';
                             </template>
 
                             <VList>
-                                <VListItem v-for="(permiso, index) in item.permisos" :key="index" @click="permiso.action">
+                                <VListItem v-for="(permiso, index) in item.permisos" :key="index" @click="handleAction(item, permiso.action)">
                                     <VListItemTitle>
                                         <VIcon small class="mr-2">{{ permiso.icon }}</VIcon>
                                         {{ permiso.title }}

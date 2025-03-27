@@ -89,36 +89,36 @@ class BatchesController extends Controller
             $permisos[] = [
                 'title' => 'Ver Procesos',
                 'icon' => 'tabler-eye-spark',
-                'action' => 'ver_proceso',
+                'action' => 'show_processes',
             ];
             $permisos[] = [
                 'title' => 'Editar',
                 'icon' => 'tabler-pencil',
-                'action' => 'editar',
+                'action' => 'edit',
             ];
             $permisos[] = [
                 'title' => 'Eliminar',
                 'icon' => 'tabler-trash',
-                'action' => 'eliminar',
+                'action' => 'delete',
             ];
         }
         if ($lote->status == 1 && $lote->signed == 0) {
             $permisos[] = [
                 'title' => 'Ver Procesos',
                 'icon' => 'tabler-eye-spark',
-                'action' => 'ver_proceso',
+                'action' => 'show_processes',
             ];
             $permisos[] = [
                 'title' => 'Eliminar',
                 'icon' => 'tabler-trash',
-                'action' => 'eliminar',
+                'action' => 'delete',
             ];
         }
         if ($lote->status == 1 && $lote->signed == 1) {
             $permisos[] = [
                 'title' => 'Ver Procesos',
                 'icon' => 'tabler-eye-spark',
-                'action' => 'ver_proceso',
+                'action' => 'show_processes',
             ];
         }
 

@@ -1,4 +1,23 @@
 <script setup>
+
+
+    const props = defineProps({
+        documents:{
+            type: Array,
+            default: () => [],
+        },
+
+    })
+
+    const documents = ref([]);
+
+    watch(() => props.documents, (newDato) => {
+
+        console.log("data en los cards:", newDato);
+        documents.value = props.documents;
+
+    }, {  immediate: true });
+
 const itemsPerPage = ref(5)
 const page = ref(1)
 const sortBy = ref()

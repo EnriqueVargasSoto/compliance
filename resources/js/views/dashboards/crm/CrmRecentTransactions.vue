@@ -3,6 +3,23 @@ import aeIcon from '@images/icons/payments/ae-icon.png'
 import mastercardIcon from '@images/icons/payments/mastercard-icon.png'
 import visaIcon from '@images/icons/payments/visa-icon.png'
 
+    const props = defineProps({
+        documents:{
+            type: Array,
+            default: () => [],
+        },
+
+    })
+
+    const documents = ref([]);
+
+    watch(() => props.documents, (newDato) => {
+
+        console.log("data en los cards:", newDato);
+        documents.value = props.documents;
+
+    }, {  immediate: true });
+
 const lastTransitions = [
   {
     cardImg: visaIcon,
@@ -71,13 +88,13 @@ const getPaddingStyle = index => index ? 'padding-block-end: 1.25rem;' : 'paddin
 </script>
 
 <template>
-  <VCard title="Last Transaction">
+  <VCard title="Últimos Documentos">
     <template #append>
       <div class="me-n2">
-        <MoreBtn
+        <!-- <MoreBtn
           size="small"
           :menu-list="moreList"
-        />
+        /> -->
       </div>
     </template>
 
@@ -85,18 +102,20 @@ const getPaddingStyle = index => index ? 'padding-block-end: 1.25rem;' : 'paddin
     <VTable class="text-no-wrap transaction-table">
       <thead>
         <tr>
-          <th>CARD</th>
-          <th>DATE</th>
-          <th>STATUS</th>
-          <th>
+          <th>RUC</th>
+          <th>Número de Documento</th>
+          <th>Establecimiento</th>
+          <th>Cliente</th>
+          <th>Estado del Documento</th>
+          <!-- <th>
             TREND
-          </th>
+          </th> -->
         </tr>
       </thead>
 
       <tbody>
         <tr
-          v-for="(transition, index) in lastTransitions"
+          v-for="(transition, index) in documents"
           :key="index"
         >
           <td
@@ -104,19 +123,19 @@ const getPaddingStyle = index => index ? 'padding-block-end: 1.25rem;' : 'paddin
             style="padding-inline-end: 1.5rem;"
           >
             <div class="d-flex align-center">
-              <div class="me-4">
+              <!-- <div class="me-4">
                 <VImg
                   :src="transition.cardImg"
                   width="50"
                 />
-              </div>
+              </div> -->
               <div>
                 <p class="text-base mb-0 text-high-emphasis">
-                  {{ transition.lastDigit }}
+                  {{ transition.client_ruc }}
                 </p>
-                <p class="text-sm mb-0">
+                <!-- <p class="text-sm mb-0">
                   {{ transition.cardType }}
-                </p>
+                </p> -->
               </div>
             </div>
           </td>
@@ -124,11 +143,29 @@ const getPaddingStyle = index => index ? 'padding-block-end: 1.25rem;' : 'paddin
             :style="getPaddingStyle(index)"
             style="padding-inline-end: 1.5rem;"
           >
-            <p class="text-high-emphasis text-base mb-0">
+            <!-- <p class="text-high-emphasis text-base mb-0">
               Sent
-            </p>
+            </p> -->
             <div class="text-sm">
-              {{ transition.sentDate }}
+              {{ transition.document_number }}
+            </div>
+          </td>
+          <td
+            :style="getPaddingStyle(index)"
+            style="padding-inline-end: 1.5rem;"
+            align="right"
+          >
+            <div class="text-high-emphasis text-base">
+              {{ transition.document_location }}
+            </div>
+          </td>
+          <td
+            :style="getPaddingStyle(index)"
+            style="padding-inline-end: 1.5rem;"
+            align="right"
+          >
+            <div class="text-high-emphasis text-base">
+              {{ transition.client_name }}
             </div>
           </td>
           <td
@@ -137,21 +174,13 @@ const getPaddingStyle = index => index ? 'padding-block-end: 1.25rem;' : 'paddin
           >
             <VChip
               label
-              :color="resolveStatus[transition.status]"
+              :color="resolveStatus['success']"
               size="small"
             >
-              {{ transition.status }}
+              {{ transition.document_status }}
             </VChip>
           </td>
-          <td
-            :style="getPaddingStyle(index)"
-            style="padding-inline-end: 1.5rem;"
-            align="right"
-          >
-            <div class="text-high-emphasis text-base">
-              {{ transition.trend }}
-            </div>
-          </td>
+
         </tr>
       </tbody>
     </VTable>

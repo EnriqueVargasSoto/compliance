@@ -6,11 +6,14 @@ import LogisticsOrderByCountries from '@/views/apps/logistics/LogisticsOrderByCo
 import LogisticsOverviewTable from '@/views/apps/logistics/LogisticsOverviewTable.vue'
 import LogisticsShipmentStatistics from '@/views/apps/logistics/LogisticsShipmentStatistics.vue'
 import LogisticsVehicleOverview from '@/views/apps/logistics/LogisticsVehicleOverview.vue'
+import CrmRecentTransactions from '@/views/dashboards/crm/CrmRecentTransactions.vue'
+
 
     const isDialogVisibleLoading = ref(false);
 
     const cards = ref([]);
     const top5 = ref();
+    const lastDocuments = ref([]);
 
     const fetchCardsDocuments = async () => {
 
@@ -18,7 +21,18 @@ import LogisticsVehicleOverview from '@/views/apps/logistics/LogisticsVehicleOve
             const { data } = await useApi(createUrl(`/card-documents`));
             cards.value = data.value;
 
+        } catch (error) {
+            isDialogVisibleLoading.value = false;
+            console.error("Error al cargar la configuración de la tabla:", error);
+            //await logout();
+        }
+    };
 
+    const fetchLastDocuments = async () => {
+
+        try {
+            const { data } = await useApi(createUrl(`/last-documents`));
+            lastDocuments.value = data.value.data;
 
         } catch (error) {
             isDialogVisibleLoading.value = false;
@@ -32,8 +46,6 @@ import LogisticsVehicleOverview from '@/views/apps/logistics/LogisticsVehicleOve
         try {
             const { data } = await useApi(createUrl(`/top-concepts-clients`));
             top5.value = data.value;
-
-
 
         } catch (error) {
             isDialogVisibleLoading.value = false;
@@ -52,6 +64,7 @@ import LogisticsVehicleOverview from '@/views/apps/logistics/LogisticsVehicleOve
         isDialogVisibleLoading.value = true;
         await fetchCardsDocuments();
         await fetchTop();
+        await fetchLastDocuments();
         isDialogVisibleLoading.value = false;
     });
 
@@ -63,7 +76,8 @@ import LogisticsVehicleOverview from '@/views/apps/logistics/LogisticsVehicleOve
       <LogisticsCardStatistics :cards="cards"/>
     </VCol>
     <VCol cols="8">
-      <LogisticsOverviewTable />
+      <!-- <LogisticsOverviewTable :documents="lastDocuments" /> -->
+      <CrmRecentTransactions :documents="lastDocuments"/>
     </VCol>
     <VCol
       cols="12"

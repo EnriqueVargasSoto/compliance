@@ -6,43 +6,64 @@
             type: Object,
             default: () => ({}),
         },
+        dynamicComponent: {
+            type: Object,
+            required: false,
+            default: null
+        },
+        dynamicComponentShowProcesses: {
+            type: Object,
+            required: false,
+            default: null
+        },
+        componentProps: {
+            type: Object,
+            default: () => ({}),
+        },
+        componentPropsShowProcesses: {
+            type: Object,
+            default: () => ({}),
+        },
 
     })
 
-    const isDialogVisible = ref(false);
-
+    //Loading visible
+    const isDialogVisibleLoading = ref(false);
+    //Variables para la tabla
     const title = ref('');
     const headers = ref([]);
-
     const items_selects = ref([]);
     const permissions = ref([]);
     const button_add = ref({});
-
     const params = ref({
         page: 1,
         per_page: 5,
         search: null,
     });
-
+    //Traer data y paginacion
     const totalPages = computed(() => {
         return data.value?.recordsTotal
             ? Math.ceil(data.value.recordsTotal / params.value.per_page)
             : 1; // Evita NaN si `data.value.total` no está definido
     });
-
-    //data obtenida del api
     const { data } = await useApi(createUrl(`/${props.endpoint}`, {query: params.value,}) ?? {});
     const tableData = computed(() => data.value?.data ?? []);
     const totalItems = computed(() => data.value?.recordsTotal ?? 0);
 
-    // Función para verificar si el usuario tiene un permiso específico
+    const localComponentProps = ref({ ...props.componentProps });
+    const localComponentPropsShowProcesses = ref({ ...props.componentPropsShowProcesses });
+
+    const emit = defineEmits(["update:componentProps", "update:componentPropsShowProcesses"]);
+
+    //Funciones
+    //Función verificar permiso
     const hasPermission = (permiso) => {
         return permissions.value.includes(permiso);
     };
 
     // Función para inicializar la tabla (obtener configuración inicial)
     const fetchInitTabla = async () => {
-        isDialogVisible.value = true;
+        isDialogVisibleLoading.value = true;
         try {
             const { data } = await useApi(createUrl(`/${props.endpoint}-init-table`,{query:props.paramsInit}));
 
@@ -54,9 +75,9 @@
             /* items_selects.value.push({ value: totalItems, title: 'Todos' }); */
             permissions.value = data?.value.data?.permissions || [];
             button_add.value = data?.value.data?.button_add || {};
-            isDialogVisible.value = false;
+            isDialogVisibleLoading.value = false;
         } catch (error) {
-            isDialogVisible.value = false;
+            isDialogVisibleLoading.value = false;
             console.error("Error al cargar la configuración de la tabla:", error);
             //await logout();
         }
@@ -65,21 +86,50 @@
     const handleAction = (item, action) => {
         switch (action) {
             case 'edit':
-            console.log(`Editar lote ID: ${item}, ${action}`);
+            // 🔥 Resetear batch antes de asignar nuevos valores
+            localComponentProps.value.data = {};
+            nextTick(() => {
+                localComponentProps.value.data = item;
+                localComponentProps.value.isDialogVisible = true;
+            });
             break;
             case 'delete':
             console.log(`Eliminar lote ID: ${item.batch}, ${action}`);
             break;
-            case 'view':
-            console.log(`Ver procesos del lote ID: ${item}, ${action}`);
+            case 'show_processes':
+                console.log('show: ',localComponentPropsShowProcesses.value );
+                localComponentPropsShowProcesses.value.data = {};
+                nextTick(() => {
+                    localComponentPropsShowProcesses.value.data = item;
+                    localComponentPropsShowProcesses.value.isDialogVisibleShowProcesses = true;
+                });
+                console.log(`Ver procesos del lote ID: ${item}, ${action}`);
+            break;
             case 'create':
-            console.log(`Ver procesos del lote ID: ${item}, ${action}`);
+            localComponentProps.value.isDialogVisible = true;
+
             break;
         }
     };
 
-    // Llamar `fetchInitTabla` una vez al montar el componente
-    onMounted(async () => {await fetchInitTabla();});
+    const closeModal = () => {
+        localComponentProps.value.isDialogVisible = false;
+        /* localComponentPropsShowProcesses.isDialogVisibleShowProcesses = false; */
+        emit("update:componentProps", { ...localComponentProps.value });
+        /* emit("update:componentPropsShowProcesses", { ...localComponentPropsShowProcesses.value }); */
+    };
+
+    const closeModalShowProcesses = () => {
+
+        localComponentPropsShowProcesses.value.isDialogVisibleShowProcesses = false;
+
+        emit("update:componentPropsShowProcesses", { ...localComponentPropsShowProcesses.value });
+    };
+
+    // Llamar funciones una vez al montar el componente
+    onMounted(async () => {
+        await fetchInitTabla();
+    });
 
 </script>
 
@@ -203,12 +253,33 @@
                 </VDataTableServer>
 
             </VCard>
+
+             <!-- Componente dinámico -->
+             <component
+                :is="dynamicComponentShowProcesses"
+                v-bind="localComponentPropsShowProcesses"
+
+                @update:is-dialog-visible-show-processes="closeModalShowProcesses"
+                @refreshTable="reloadTable"
+            />
+
+            <!-- Componente dinámico -->
+            <component
+                :is="dynamicComponent"
+                v-bind="localComponentProps"
+
+                @update:is-dialog-visible="closeModal"
+                @refreshTable="reloadTable"
+            />
+
+
+
         </VCol>
     </VRow>
 
      <!-- Dialog -->
      <VDialog
-        v-model="isDialogVisible"
+        v-model="isDialogVisibleLoading"
         width="300"
     >
         <VCard

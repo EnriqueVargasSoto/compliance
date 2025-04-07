@@ -1,160 +1,130 @@
 <script setup>
-import CrmActiveProject from '@/views/dashboards/crm/CrmActiveProject.vue'
-import CrmActivityTimeline from '@/views/dashboards/crm/CrmActivityTimeline.vue'
-import CrmAnalyticsSales from '@/views/dashboards/crm/CrmAnalyticsSales.vue'
-import CrmEarningReportsYearlyOverview from '@/views/dashboards/crm/CrmEarningReportsYearlyOverview.vue'
-import CrmOrderBarChart from '@/views/dashboards/crm/CrmOrderBarChart.vue'
-import CrmProjectStatus from '@/views/dashboards/crm/CrmProjectStatus.vue'
-import CrmRecentTransactions from '@/views/dashboards/crm/CrmRecentTransactions.vue'
-import CrmRevenueGrowth from '@/views/dashboards/crm/CrmRevenueGrowth.vue'
-import CrmSalesAreaCharts from '@/views/dashboards/crm/CrmSalesAreaCharts.vue'
-import CrmSalesByCountries from '@/views/dashboards/crm/CrmSalesByCountries.vue'
+import LogisticsCardStatistics from '@/views/apps/logistics/LogisticsCardStatistics.vue'
+import LogisticsDeliveryExpectations from '@/views/apps/logistics/LogisticsDeliveryExpectations.vue'
+import LogisticsDeliveryPerformance from '@/views/apps/logistics/LogisticsDeliveryPerformance.vue'
+import LogisticsOrderByCountries from '@/views/apps/logistics/LogisticsOrderByCountries.vue'
+import LogisticsOverviewTable from '@/views/apps/logistics/LogisticsOverviewTable.vue'
+import LogisticsShipmentStatistics from '@/views/apps/logistics/LogisticsShipmentStatistics.vue'
+import LogisticsVehicleOverview from '@/views/apps/logistics/LogisticsVehicleOverview.vue'
 
-const simpleStatisticsDemoCards = [
-  {
-    icon: 'tabler-credit-card',
-    color: 'error',
-    title: 'Total Profit',
-    subTitle: 'Last week',
-    stat: '1.28k',
-    change: '-12.2%',
-  },
-  {
-    icon: 'tabler-currency-dollar',
-    color: 'success',
-    title: 'Total Sales',
-    subTitle: 'Last week',
-    stat: '$4,673',
-    change: '+25.2%',
-  },
-]
+    const isDialogVisibleLoading = ref(false);
+
+    const cards = ref([]);
+    const top5 = ref();
+
+    const fetchCardsDocuments = async () => {
+
+        try {
+            const { data } = await useApi(createUrl(`/card-documents`));
+            cards.value = data.value;
+
+
+
+        } catch (error) {
+            isDialogVisibleLoading.value = false;
+            console.error("Error al cargar la configuración de la tabla:", error);
+            //await logout();
+        }
+    };
+
+    const fetchTop = async () => {
+
+        try {
+            const { data } = await useApi(createUrl(`/top-concepts-clients`));
+            top5.value = data.value;
+
+
+
+        } catch (error) {
+            isDialogVisibleLoading.value = false;
+            console.error("Error al cargar la configuración de la tabla:", error);
+            //await logout();
+        }
+    };
+
+    /* watch(() => cards, (newDato) => {
+
+        cards.value = newDato;
+    }, {  immediate: true }); */
+
+    // Llamar funciones una vez al montar el componente
+    onMounted(async () => {
+        isDialogVisibleLoading.value = true;
+        await fetchCardsDocuments();
+        await fetchTop();
+        isDialogVisibleLoading.value = false;
+    });
+
 </script>
 
 <template>
   <VRow class="match-height">
-    <VCol
-      cols="12"
-      md="4"
-      sm="6"
-      lg="2"
-    >
-      <CrmOrderBarChart />
+    <VCol cols="12">
+      <LogisticsCardStatistics :cards="cards"/>
     </VCol>
-
-    <VCol
-      cols="12"
-      md="4"
-      sm="6"
-      lg="2"
-    >
-      <CrmSalesAreaCharts />
+    <VCol cols="8">
+      <LogisticsOverviewTable />
     </VCol>
-
-    <VCol
-      v-for="demo in simpleStatisticsDemoCards"
-      :key="demo.title"
-      cols="12"
-      sm="6"
-      md="4"
-      lg="2"
-    >
-      <VCard>
-        <VCardText>
-          <VAvatar
-            :color="demo.color"
-            variant="tonal"
-            rounded
-            size="44"
-          >
-            <VIcon
-              :icon="demo.icon"
-              size="28"
-            />
-          </VAvatar>
-
-          <h5 class="text-h5 mt-3">
-            {{ demo.title }}
-          </h5>
-          <p class="my-1">
-            {{ demo.subTitle }}
-          </p>
-          <p class="mb-3 text-high-emphasis">
-            {{ demo.stat }}
-          </p>
-          <VChip
-            :color="demo.color"
-            label
-            size="small"
-          >
-            {{ demo.change }}
-          </VChip>
-        </VCardText>
-      </VCard>
-    </VCol>
-
-    <!-- 👉 Revenue Growth -->
-    <VCol
-      cols="12"
-      md="8"
-      lg="4"
-    >
-      <CrmRevenueGrowth />
-    </VCol>
-
-    <!-- 👉 Earning Reports -->
-    <VCol
-      cols="12"
-      md="8"
-    >
-      <CrmEarningReportsYearlyOverview />
-    </VCol>
-
-    <!-- 👉 Sales -->
     <VCol
       cols="12"
       md="4"
     >
-      <CrmAnalyticsSales />
+      <LogisticsOrderByCountries :top="top5" />
     </VCol>
-
-    <!-- 👉 Browser States -->
-    <VCol
+    <!-- <VCol
       cols="12"
-      md="4"
+      md="6"
     >
-      <CrmSalesByCountries />
+      <LogisticsVehicleOverview />
     </VCol>
 
-    <!-- 👉 Project Status -->
-    <VCol
-      cols="12"
-      md="4"
-    >
-      <CrmProjectStatus />
-    </VCol>
-
-    <!-- 👉 Active Project -->
-    <VCol
-      cols="12"
-      md="4"
-    >
-      <CrmActiveProject />
-    </VCol>
-
-    <!-- 👉 Recent Transactions -->
     <VCol
       cols="12"
       md="6"
     >
-      <CrmRecentTransactions />
+      <LogisticsShipmentStatistics />
+    </VCol> -->
+
+    <!-- <VCol
+      cols="12"
+      md="4"
+    >
+      <LogisticsDeliveryPerformance />
     </VCol>
 
-    <!-- 👉 Active timeline -->
     <VCol
       cols="12"
-      md="6"
+      md="4"
     >
-      <CrmActivityTimeline />
+      <LogisticsDeliveryExpectations />
     </VCol>
+
+    <VCol
+      cols="12"
+      md="4"
+    >
+      <LogisticsOrderByCountries />
+    </VCol> -->
+
+    <!-- Dialog -->
+    <VDialog
+        v-model="isDialogVisibleLoading"
+        width="300"
+    >
+        <VCard
+        color="primary"
+        width="300"
+        >
+            <VCardText class="pt-3">
+                Cargando...
+                <VProgressLinear
+                indeterminate
+                bg-color="rgba(var(--v-theme-surface), 0.1)"
+                :height="8"
+                class="mb-0 mt-4"
+                />
+            </VCardText>
+        </VCard>
+    </VDialog>
   </VRow>
 </template>

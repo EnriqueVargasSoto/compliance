@@ -113,6 +113,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 5000,
   },
   optimizeDeps: {
+
     exclude: ['vuetify'],
     entries: [
       './resources/js/**/*.vue',

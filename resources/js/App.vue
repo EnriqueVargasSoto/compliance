@@ -8,6 +8,8 @@ import {
 } from '@core/stores/config'
 import { hexToRgb } from '@core/utils/colorConverter'
 
+/* import { pdfjs } from 'pdfjs-dist' */;
+
 const { global } = useTheme()
 
 // ℹ️ Sync current theme with initial loader theme

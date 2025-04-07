@@ -17,6 +17,15 @@ import '@styles/styles.scss'
 
 import { registerPlugins } from '@core/utils/plugins'
 
+/* const app = createApp(App); */
+
+
+
+
+import Vue3Pdfjs from 'vue3-pdfjs'; // Importa la biblioteca
+import PdfjsViewer from 'vue3-pdfjs'; // Asegúrate de importar correctamente
+
+
 
 const app = createApp(App);
 /* const pinia = createPinia();
@@ -39,5 +48,7 @@ registerPlugins(app)
 app.use(i18n)
 app.use(vuetify)  // Usa Vuetify
 app.use(pinia) // 🔹 REGISTRAR PINIA ANTES DE USARLO */
+app.use(Vue3Pdfjs); // Registra la biblioteca como un plugin
+app.use(PdfjsViewer);  // Registra el plugin aquí
 /* app.use(router); */
 app.mount('#app');

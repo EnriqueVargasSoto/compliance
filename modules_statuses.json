@@ -3,5 +3,6 @@
     "Security": true,
     "Batches": true,
     "Processes": true,
-    "Documents": true
+    "Documents": true,
+    "Dashboard": true
 }

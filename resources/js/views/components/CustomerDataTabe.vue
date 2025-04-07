@@ -157,7 +157,6 @@ ability.update([])
         if (props.id) {
             localComponentProps.value.id = props.id;
         }
-        //localComponentProps.value.dato = dato;
     };
 
     // Función para cerrar el modal
